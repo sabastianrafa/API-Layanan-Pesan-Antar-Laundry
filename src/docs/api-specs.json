@@ -1,0 +1,514 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Laundry Service API",
+    "version": "1.0.0",
+    "description": "API untuk sistem layanan pesan antar laundry"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Local server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "Endpoint untuk registrasi dan login"
+    },
+    {
+      "name": "User",
+      "description": "Endpoint terkait user"
+    },
+    {
+      "name": "Layanan",
+      "description": "Endpoint untuk manajemen layanan"
+    },
+    {
+      "name": "Pesanan",
+      "description": "Endpoint untuk manajemen pesanan"
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Registrasi user baru",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRegister"
+              },
+              "example": {
+                "username": "john_doe",
+                "email": "john@example.com",
+                "password": "password123",
+                "alamat": "Jl. Contoh 123",
+                "telepon": "08123456789"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User berhasil terdaftar",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": 1,
+                    "username": "john_doe",
+                    "email": "john@example.com",
+                    "role": "USER"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Login user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLogin"
+              },
+              "example": {
+                "email": "john@example.com",
+                "password": "password123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login berhasil",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  "user": {
+                    "id": 1,
+                    "username": "john_doe",
+                    "role": "USER"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Dapatkan profil user yang login",
+        "security": [{"BearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Data user",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": 1,
+                    "username": "john_doe",
+                    "email": "john@example.com",
+                    "alamat": "Jl. Contoh 123",
+                    "telepon": "08123456789",
+                    "role": "USER"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/layanan": {
+      "get": {
+        "tags": ["Layanan"],
+        "summary": "Dapatkan semua layanan",
+        "responses": {
+          "200": {
+            "description": "Daftar layanan",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": [
+                    {
+                      "id": 1,
+                      "nama": "Cuci Reguler",
+                      "harga_kg": 10000,
+                      "createdAt": "2023-11-10T08:00:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Layanan"],
+        "summary": "Tambah layanan baru (Admin only)",
+        "security": [{"BearerAuth": []}],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LayananCreate"
+              },
+              "example": {
+                "nama": "Cuci Express",
+                "harga_kg": 15000
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Layanan berhasil ditambahkan",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": 2,
+                    "nama": "Cuci Express",
+                    "harga_kg": 15000,
+                    "createdAt": "2023-11-10T09:00:00.000Z"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/layanan/{id}": {
+      "put": {
+        "tags": ["Layanan"],
+        "summary": "Update layanan (Admin only)",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LayananUpdate"
+              },
+              "example": {
+                "nama": "Cuci Express Plus",
+                "harga_kg": 18000
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Layanan berhasil diupdate",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": 2,
+                    "nama": "Cuci Express Plus",
+                    "harga_kg": 18000
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Layanan"],
+        "summary": "Hapus layanan (Admin only)",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Layanan berhasil dihapus",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Layanan deleted"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pesanan": {
+      "post": {
+        "tags": ["Pesanan"],
+        "summary": "Buat pesanan baru",
+        "security": [{"BearerAuth": []}],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PesananCreate"
+              },
+              "example": {
+                "layananId": 1,
+                "berat_kg": 3.5
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Pesanan berhasil dibuat",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": 1,
+                    "userId": 1,
+                    "layananId": 1,
+                    "berat_kg": 3.5,
+                    "total_harga": 35000,
+                    "status": "PENDING",
+                    "tanggal": "2023-11-10T10:00:00.000Z"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Pesanan"],
+        "summary": "Dapatkan semua pesanan (Admin only)",
+        "security": [{"BearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Daftar pesanan",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": [
+                    {
+                      "id": 1,
+                      "userId": 1,
+                      "layananId": 1,
+                      "berat_kg": 3.5,
+                      "total_harga": 35000,
+                      "status": "PENDING",
+                      "tanggal": "2023-11-10T10:00:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pesanan/me": {
+      "get": {
+        "tags": ["Pesanan"],
+        "summary": "Dapatkan pesanan milik user",
+        "security": [{"BearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Daftar pesanan user",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": [
+                    {
+                      "id": 1,
+                      "layananId": 1,
+                      "berat_kg": 3.5,
+                      "total_harga": 35000,
+                      "status": "PENDING",
+                      "tanggal": "2023-11-10T10:00:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pesanan/{id}/status": {
+      "put": {
+        "tags": ["Pesanan"],
+        "summary": "Update status pesanan (Admin only)",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PesananUpdateStatus"
+              },
+              "example": {
+                "status": "ACCEPTED"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Status pesanan berhasil diupdate",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": 1,
+                    "status": "ACCEPTED"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "UserRegister": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 3
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 6
+          },
+          "alamat": {
+            "type": "string"
+          },
+          "telepon": {
+            "type": "string"
+          }
+        },
+        "required": ["username", "email", "password"]
+      },
+      "UserLogin": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": ["email", "password"]
+      },
+      "LayananCreate": {
+        "type": "object",
+        "properties": {
+          "nama": {
+            "type": "string"
+          },
+          "harga_kg": {
+            "type": "number",
+            "minimum": 1000
+          }
+        },
+        "required": ["nama", "harga_kg"]
+      },
+      "LayananUpdate": {
+        "type": "object",
+        "properties": {
+          "nama": {
+            "type": "string"
+          },
+          "harga_kg": {
+            "type": "number",
+            "minimum": 1000
+          }
+        }
+      },
+      "PesananCreate": {
+        "type": "object",
+        "properties": {
+          "layananId": {
+            "type": "integer"
+          },
+          "berat_kg": {
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 20
+          }
+        },
+        "required": ["layananId", "berat_kg"]
+      },
+      "PesananUpdateStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["PENDING", "ACCEPTED", "REJECTED", "IN_PROGRESS", "COMPLETED"]
+          }
+        },
+        "required": ["status"]
+      }
+    }
+  }
+}
