@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @db.VarChar(100)
+  email     String   @unique
+  password  String
+  alamat    String?
+  telepon   String?  @db.VarChar(20)
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  pesanan   Pesanan[]
+
+  @@map("users")
+}
+
+model Layanan {
+  id        Int      @id @default(autoincrement())
+  nama      String   @db.VarChar(100)
+  harga_kg  Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  pesanan   Pesanan[]
+
+  @@map("layanan")
+}
+
+model Pesanan {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
+  layanan    Layanan  @relation(fields: [layananId], references: [id])
+  layananId  Int
+  berat_kg   Float
+  total_harga Float
+  status     Status   @default(PENDING)
+  tanggal    DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("pesanan")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Status {
+  PENDING
+  ACCEPTED
+  REJECTED
+  IN_PROGRESS
+  COMPLETED
+}
