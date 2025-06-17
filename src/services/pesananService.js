@@ -4,7 +4,12 @@ import { NotFoundError, BadRequestError } from '../utils/errors.js';
 const prisma = new PrismaClient();
 
 export const createPesanan = async (userId, { layananId, berat_kg }) => {
-  // Dapatkan harga layanan
+  // Validate berat_kg
+  if (berat_kg <= 0 || berat_kg > 20) {
+    throw new BadRequestError('Berat harus antara 0.1 kg dan 20 kg');
+  }
+
+  // Get layanan
   const layanan = await prisma.layanan.findUnique({
     where: { id: layananId }
   });
@@ -13,7 +18,7 @@ export const createPesanan = async (userId, { layananId, berat_kg }) => {
     throw new NotFoundError('Layanan tidak ditemukan');
   }
 
-  // Hitung total harga
+  // Calculate total
   const total_harga = layanan.harga_kg * berat_kg;
 
   return await prisma.pesanan.create({
@@ -65,6 +70,11 @@ export const getAllPesanan = async () => {
 };
 
 export const updateStatusPesanan = async (pesananId, status) => {
+  const validStatuses = ['PENDING', 'ACCEPTED', 'REJECTED', 'IN_PROGRESS', 'COMPLETED'];
+  if (!validStatuses.includes(status)) {
+    throw new BadRequestError('Status tidak valid');
+  }
+
   const pesanan = await prisma.pesanan.findUnique({
     where: { id: pesananId }
   });

@@ -1,7 +1,7 @@
 import Joi from 'joi';
 
 export const createPesananSchema = Joi.object({
-  layananId: Joi.number().integer().required(),
+  layananId: Joi.number().integer().positive().required(),
   berat_kg: Joi.number().min(0.1).max(20).required()
 });
 

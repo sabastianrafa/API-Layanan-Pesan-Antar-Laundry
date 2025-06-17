@@ -10,7 +10,12 @@ export const getAllLayanan = async () => {
 };
 
 export const createLayanan = async (data) => {
-  return await prisma.layanan.create({ data });
+  return await prisma.layanan.create({
+    data: {
+      nama: data.nama,
+      harga_kg: data.harga_kg
+    }
+  });
 };
 
 export const updateLayanan = async (id, data) => {
@@ -19,7 +24,10 @@ export const updateLayanan = async (id, data) => {
 
   return await prisma.layanan.update({
     where: { id },
-    data
+    data: {
+      nama: data.nama,
+      harga_kg: data.harga_kg
+    }
   });
 };
 
