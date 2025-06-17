@@ -5,20 +5,9 @@ import { BadRequestError } from '../utils/errors.js';
  * @param {Joi.Schema} schema - Schema Joi untuk validasi
  */
 export const validate = (schema) => (req, res, next) => {
-  // Periksa jika Content-Type adalah JSON
-  if (!req.is('application/json')) {
-    return res.status(400).json({
-      success: false,
-      message: 'Content-Type harus application/json',
-      errors: []
-    });
-  }
-
-  // Biarkan Joi yang menangani validasi body kosong
-  const { error, value } = schema.validate(req.body || {}, {
+  const { error, value } = schema.validate(req.body, {
     abortEarly: false,
-    stripUnknown: true,
-    allowUnknown: false
+    stripUnknown: true
   });
 
   if (error) {
@@ -26,13 +15,9 @@ export const validate = (schema) => (req, res, next) => {
       field: detail.path.join('.'),
       message: detail.message.replace(/['"]/g, '')
     }));
-    return res.status(400).json({
-      success: false,
-      message: 'Validation Error',
-      errors
-    });
+    throw new BadRequestError('Validation Error', errors);
   }
 
-  req.body = value;
+  req.body = value; // Gunakan value yang sudah divalidasi
   next();
 };

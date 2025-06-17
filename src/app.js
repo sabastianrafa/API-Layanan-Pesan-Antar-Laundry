@@ -5,13 +5,10 @@ import authRoutes from './routes/authRoutes.js';
 import layananRoutes from './routes/layananRoutes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import pesananRoutes from './routes/pesananRoutes.js';
-import bodyParser from 'body-parser';
 
 const app = express();
 
 app.use(express.json());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/auth', authRoutes);
